@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+
+<html>
+
+    <head>
+        <meta charset="utf-8">
+        <title>Jovana's Bookstore</title>
+        <link rel="stylesheet" href="Проект_2.css">
+        <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+        <script>
+            var sliki = [];
+
+            let kjeKomentira = localStorage.getItem('kjeKomentira');
+            let username = localStorage.getItem('username');
+
+            $(document).ready(function () {
+                function uploadImage() {
+                    var fileInput = $('#fileInput')[0];
+                    var file = fileInput.files[0];
+
+                    if (file) {
+                        var reader = new FileReader();
+
+                        reader.onload = function (e) {
+                            var imageData = {
+                            src: e.target.result,
+                            likes: 0,
+                            comments: []
+                            };
+
+                            sliki.push(imageData);
+                            renderImages();
+                        };
+
+                        reader.readAsDataURL(file);
+                    } else {
+                    console.warn('Не е селектиран фајл.');
+                    }
+                }
+
+                function deleteImage(index) {
+                    sliki.splice(index, 1);
+                    renderImages();
+                }
+
+                function likeImage(index) {
+                    sliki[index].likes++;
+                    renderImages();
+                }
+
+                function addComment(index, commentInput) {
+                    var comment = commentInput.value;
+                    if (comment.trim() !== '') {
+                        console.log(kjeKomentira);
+                        console.log(username);
+                        if(kjeKomentira === username)
+                        {
+                            sliki[index].comments.push(`${kjeKomentira}: ${comment}`);
+                        } else {
+                            sliki[index].comments.push(`Username: ${comment}`);
+                        }
+                        renderImages();
+                        commentInput.value = '';
+                    }
+                }
+
+                function renderImages() {
+                    var imageContainer = $('#imageContainer');
+                    imageContainer.empty();
+
+                    $.each(sliki, function (index, image) {
+                        var imageElement = $('<div class="image"></div>');
+
+                        var img = $('<img>').attr({
+                            src: image.src,
+                            alt: 'Слика ' + (index + 1)
+                        });
+
+                        var likeBtn = $('<span class="like-button">&#x2661; ' + image.likes + '</span>').click(function () {
+                            likeImage(index);
+                        });
+
+                        var commentInput = $('<input type="text" placeholder="Додадете коментар...">');
+
+                        var commentBtn = $('<button>Коментирај</button>').click(function () {
+                            if (commentInput.val().trim() !== '') {
+                                addComment(index, commentInput[0]);
+                                commentInput.val('');
+                                renderImages();
+                            }
+                        });
+
+                        var commentsContainer = $('<div class="comments-container"></div>');
+
+                        $.each(image.comments, function (_, comment) {
+                            var commentElement = $('<p></p>').text(comment);
+                            commentsContainer.append(commentElement);
+                        });
+
+                        var deleteBtn = $('<button>Избриши</button>').click(function () {
+                            deleteImage(index);
+                        });
+
+                        imageElement.append(img, likeBtn, commentInput, commentBtn, commentsContainer, deleteBtn);
+                        imageContainer.append(imageElement);
+                    });
+                }
+
+                var addImageBtn = $('<button id = "addImageBtn">Додади слика</button>').click(function () {
+                    $('#fileInput').click();
+                });
+
+                var buttonsContainer = $('<div id="buttonsContainer"></div>').append(addImageBtn);
+                $('#opis').append(buttonsContainer);
+
+                $('#fileInput').change(function () {
+                    uploadImage();
+                });
+            });
+        </script>
+    </head>
+
+    <body>
+        <header>
+            <h1> JOVANA'S BOOKSTORE </h1>
+            <nav>
+                <a href = "Проект_2.html"> Дома </a>
+                <a href = "Книги.html"> Книги </a>
+                <a href = "Најава.html"> Најава </a>
+                <a href = "Регистрација.html"> Регистрација </a>
+                <a href = "Профил.html"> Профил </a>
+                <a href = "Анкета.html"> Анкета </a>
+            </nav>
+        </header>
+
+        <main>
+            <section id = "profil">
+                <h2> Профил </h2>
+                <p id = "opis">
+                    <input type = "file" id = "fileInput" accept = "image/*" style = "display: none;">
+                    <div id = "imageContainer"></div>
+                </p>
+            </section>
+        </main>
+
+        <footer>
+            <h1> Контакт-инфо: </h1>
+            <h2> Телефон: 07x/xxx-xxx</h2>
+            <h2> E-mail: <a href = "https://www.yahoo.com"> меил </a></h2>
+            <h2> Социјални мрежи: </h2>
+            <ul>
+                <li><h2> Facebook: <a href = "https://www.facebook.com"> фејсбук </a></h2></li>
+                <li><h2> Instagram: <a href = "https://www.instagram.com"> инстаграм </a></h2></li>
+            </ul>
+        </footer>
+    </body>
+</html>
